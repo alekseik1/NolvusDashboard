@@ -13,6 +13,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Nolvus.Dashboard.Core;
 using Nolvus.Dashboard.Frames;
+using Nolvus.Dashboard.Frames.Installer;
 using Nolvus.Dashboard.Frames.Settings;
 using Nolvus.Dashboard.Controls;
 using Nolvus.Browser;
@@ -510,6 +511,7 @@ public partial class DashboardWindow : Window, IDashboard
         StripLblNexus.Text = string.Empty;
         
         TitleBarControl.OnSettingsClicked += TitleBarControl_OnSettingsClicked;
+        TitleBarControl.OnStockGameClicked += TitleBarControl_OnStockGameClicked;
         TitleBarControl.Title = "Nolvus Dashboard";
         TitleBarControl.InfoCaption = string.Format("v{0} | Not logged in", ServiceSingleton.Dashboard.Version);
         var uri = new Uri("avares://NolvusDashboard/Assets/nolvus-ico.jpg");
@@ -570,6 +572,17 @@ public partial class DashboardWindow : Window, IDashboard
         else
         {
             NolvusMessageBox.Show(owner, "Settings", "This action is not allowed during mod list installation!", MessageBoxType.Error);
+        }
+    }
+
+    private void TitleBarControl_OnStockGameClicked(object? sender, EventArgs e)
+    {
+        if (!ServiceSingleton.Packages.Processing)
+            ServiceSingleton.Dashboard.LoadFrame<DowngraderFrame>();
+        else
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            NolvusMessageBox.Show(owner, "Stock Game", "This action is not allowed during mod list installation!", MessageBoxType.Error);
         }
     }
 

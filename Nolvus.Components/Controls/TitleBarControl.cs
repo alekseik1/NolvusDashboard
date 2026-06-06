@@ -13,6 +13,7 @@ using Nolvus.Core.Services;
 namespace Nolvus.Components.Controls
 {
     public delegate void SettingsHandler(object sender, EventArgs e);
+    public delegate void StockGameHandler(object sender, EventArgs e);
 
     public class TitleBarControl : UserControl
     {
@@ -23,11 +24,13 @@ namespace Nolvus.Components.Controls
         private Avalonia.Controls.Image AccountImage = null!;
         private Avalonia.Controls.Image AppIcon = null!;
         private Button SettingsButton = null!;
+        private Button StockGameButton = null!;
         private Button MinButton = null!;
         private Button MaxButton = null!;
         private Button CloseButton = null!;
 
         private event SettingsHandler OnSettingsClickedEvent;
+        private event StockGameHandler OnStockGameClickedEvent;
 
         public event SettingsHandler OnSettingsClicked
         {
@@ -53,6 +56,30 @@ namespace Nolvus.Components.Controls
             }
         }
 
+        public event StockGameHandler OnStockGameClicked
+        {
+            add
+            {
+                if (OnStockGameClickedEvent != null)
+                {
+                    lock (OnStockGameClickedEvent)
+                        OnStockGameClickedEvent += value;
+                }
+                else
+                {
+                    OnStockGameClickedEvent = value;
+                }
+            }
+            remove
+            {
+                if (OnStockGameClickedEvent != null)
+                {
+                    lock (OnStockGameClickedEvent)
+                        OnStockGameClickedEvent -= value;
+                }
+            }
+        }
+
         public string Title
         {
             get => LblTitle.Text;
@@ -73,7 +100,7 @@ namespace Nolvus.Components.Controls
                 //ColumnDefinitions = new ColumnDefinitions("Auto,Auto,*,Auto"),
                 //VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 Background = new SolidColorBrush(Avalonia.Media.Color.FromRgb(54, 54, 54)),
-                ColumnDefinitions = new ColumnDefinitions("40,*,Auto,Auto,Auto,Auto,Auto,Auto"),
+                ColumnDefinitions = new ColumnDefinitions("40,*,Auto,Auto,Auto,Auto,Auto,Auto,Auto"),
                 Height = 50
             };
 
@@ -129,14 +156,18 @@ namespace Nolvus.Components.Controls
             };
             Grid.SetColumn(SettingsButton, 4);
 
+            StockGameButton = MakeButton("🔧");
+            ToolTip.SetTip(StockGameButton, "Stock Game");
+            Grid.SetColumn(StockGameButton, 5);
+
             MinButton = MakeButton("—");
-            Grid.SetColumn(MinButton, 5);
+            Grid.SetColumn(MinButton, 6);
 
             MaxButton = MakeButton("▢");
-            Grid.SetColumn(MaxButton, 6);
+            Grid.SetColumn(MaxButton, 7);
 
             CloseButton = MakeButton("✕");
-            Grid.SetColumn(CloseButton, 7);
+            Grid.SetColumn(CloseButton, 8);
 
             MinButton.Click += (_, __) =>
             {
@@ -188,6 +219,7 @@ namespace Nolvus.Components.Controls
             };
 
             SettingsButton.Click += SettingsBox_Click;
+            StockGameButton.Click += StockGameButton_Click;
             // ToolTip.SetTip(SettingsBox, "Global settings");
             // Grid.SetColumn(SettingsBox, 3);
 
@@ -200,6 +232,7 @@ namespace Nolvus.Components.Controls
             panel.Children.Add(LblInfo);
             panel.Children.Add(AccountImage);
             panel.Children.Add(SettingsButton);
+            panel.Children.Add(StockGameButton);
             panel.Children.Add(MinButton);
             panel.Children.Add(MaxButton);
             panel.Children.Add(CloseButton);
@@ -233,6 +266,12 @@ namespace Nolvus.Components.Controls
         public void HideLoading()
         {
             SettingsButton.IsVisible = false;
+        }
+
+        private void StockGameButton_Click(object? sender, RoutedEventArgs e)
+        {
+            var handler = OnStockGameClickedEvent;
+            handler?.Invoke(this, EventArgs.Empty);
         }
 
         private void SettingsBox_Click(object? sender, RoutedEventArgs e)
