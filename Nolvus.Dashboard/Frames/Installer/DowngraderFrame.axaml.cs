@@ -154,7 +154,8 @@ namespace Nolvus.Dashboard.Frames.Installer
                 stockGameManager.OnStepProcessed += StockGameManager_OnStepProcessed;
 
                 await stockGameManager.Load();
-                await stockGameManager.CheckIntegrity();
+                if (ChkSkipHash.IsChecked != true)
+                    await stockGameManager.CheckIntegrity();
                 await stockGameManager.CopyGameFiles();
                 await stockGameManager.PatchGameFiles();
                 await AddItemToList("Stock Game creation completed successfully.");
