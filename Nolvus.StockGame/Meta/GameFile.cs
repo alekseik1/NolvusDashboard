@@ -50,20 +50,38 @@ namespace Nolvus.StockGame.Meta
             }            
         }       
 
+        private static string FindCaseInsensitive(string directory, string fileName)
+        {
+            if (!Directory.Exists(directory))
+                return null;
+            return Directory.EnumerateFiles(directory)
+                .FirstOrDefault(f => string.Equals(Path.GetFileName(f), fileName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static string ResolveFilePath(string exactPath)
+        {
+            if (File.Exists(exactPath))
+                return exactPath;
+            var dir = Path.GetDirectoryName(exactPath);
+            var name = Path.GetFileName(exactPath);
+            return FindCaseInsensitive(dir, name);
+        }
+
         public void Check(string GameDir, string LgCode)
         {
             string FileName = Path.Combine(this.GetGameDir(GameDir), this.Name);
+            string resolved = ResolveFilePath(FileName);
 
-            if (!File.Exists(FileName))
+            if (resolved == null)
             {
                 if (!this.FileSkip || (this.Name == string.Format("Skyrim - Voices_{0}0.bsa", LgCode.ToLower())))
                 {
                     throw new GameFileMissingException("Game file : " + FileName + " does not exist!");
                 }
             }
-            else if ((ServiceSingleton.Files.GetHash(FileName) != this.Hash) && !this.HashSkip)
+            else if ((ServiceSingleton.Files.GetHash(resolved) != this.Hash) && !this.HashSkip)
             {
-                throw new GameFileIntegrityException("Hash for game file : " + FileName + " does not match!");
+                throw new GameFileIntegrityException("Hash for game file : " + resolved + " does not match!");
             }
         }
 
@@ -84,9 +102,10 @@ namespace Nolvus.StockGame.Meta
                 Directory.CreateDirectory(DestFileInfo.Directory.FullName);
             }
 
-            if (File.Exists(SourceFileName))
+            string resolved = ResolveFilePath(SourceFileName);
+            if (resolved != null)
             {
-                File.Copy(SourceFileName, DestinationFileName, true);
+                File.Copy(resolved, DestinationFileName, true);
             }
             else if (!this.FileSkip || (this.Name == string.Format("Skyrim - Voices_{0}0.bsa", LgCode.ToLower())))
             {
