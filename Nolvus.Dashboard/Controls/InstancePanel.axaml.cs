@@ -238,6 +238,13 @@ namespace Nolvus.Dashboard.Controls
 
             menu.Items.Add(new Separator());
 
+            // Stock Game
+            var miStockGame = new MenuItem { Header = "Stock Game" };
+            miStockGame.Click += (_, __) => BrItmStockGame_Click();
+            menu.Items.Add(miStockGame);
+
+            menu.Items.Add(new Separator());
+
             // Delete Instance
             var miDelete = new MenuItem { Header = "Delete Instance" };
             miDelete.Click += (_, __) => BrItmDelete_Click();
@@ -635,6 +642,13 @@ Categories=Game;Utility;
             File.WriteAllText(desktopFile, contents);
 
             Process.Start("chmod", $"+x \"{desktopFile}\"");
+        }
+
+        private void BrItmStockGame_Click()
+        {
+            ServiceSingleton.Instances.WorkingInstance = _instance;
+            ServiceSingleton.Dashboard.LoadFrame<DowngraderFrame>(
+                new FrameParameters(new FrameParameter { Key = "Instance", Value = _instance }));
         }
 
         private async void BrItmRemap_Click()

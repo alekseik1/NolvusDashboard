@@ -179,7 +179,10 @@ namespace Nolvus.StockGame.Patcher
                 ServiceSingleton.Logger.Log($"  Patch       = {PatchFileName}");
                 ServiceSingleton.Logger.Log($"  Destination = {DestinationFileName}");
 
-                var xdeltaPath = Path.Combine(ServiceSingleton.Folders.LibDirectory, "xdelta3");
+                var libXdelta = Path.Combine(ServiceSingleton.Folders.LibDirectory, "xdelta3");
+                var xdeltaPath = File.Exists(libXdelta)
+                    ? libXdelta
+                    : Nolvus.Core.Utils.ExecutableResolver.FindExecutable("xdelta3") ?? libXdelta;
                 var psi = new ProcessStartInfo
                 {
                     WorkingDirectory = DestDir,
@@ -260,7 +263,10 @@ namespace Nolvus.StockGame.Patcher
                 {
                     var workingDirectory = new FileInfo(destinationFile).DirectoryName ?? ".";
                     
-                    var xdeltaPath = Path.Combine(ServiceSingleton.Folders.LibDirectory, "xdelta3");
+                    var libXdelta = Path.Combine(ServiceSingleton.Folders.LibDirectory, "xdelta3");
+                    var xdeltaPath = File.Exists(libXdelta)
+                        ? libXdelta
+                        : Nolvus.Core.Utils.ExecutableResolver.FindExecutable("xdelta3") ?? libXdelta;
                     var psi = new ProcessStartInfo
                     {
                         FileName = xdeltaPath,
