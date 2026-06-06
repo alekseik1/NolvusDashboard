@@ -48,7 +48,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Restore
-        run: dotnet restore "Nolvus Dashboard Linux.sln"
+        run: dotnet restore "Nolvus Dashboard Linux.sln" -r linux-x64
 
       - name: Publish Dashboard
         run: |
