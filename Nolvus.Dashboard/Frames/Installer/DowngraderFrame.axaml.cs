@@ -49,6 +49,12 @@ namespace Nolvus.Dashboard.Frames.Installer
                 BtnStart.IsEnabled = false;
                 await AddItemToList("xdelta3 not found. Install it (e.g. apt install xdelta3) or place it at lib/xdelta3.");
             }
+
+            if (ApiManager.Service == null)
+            {
+                BtnStart.IsEnabled = false;
+                await AddItemToList("Not logged in to Nolvus API. Please log in first.");
+            }
         }
 
         private async void BtnBrowseSkyrimDir_Click(object? sender, RoutedEventArgs e)
@@ -108,6 +114,12 @@ namespace Nolvus.Dashboard.Frames.Installer
             if (string.IsNullOrWhiteSpace(TxtOutputDir.Text))
             {
                 await NolvusMessageBox.Show(owner, "Validation Error", "Please select an output directory.", MessageBoxType.Error);
+                return;
+            }
+
+            if (ApiManager.Service == null)
+            {
+                await NolvusMessageBox.Show(owner, "Not Logged In", "Please log in to Nolvus before creating a Stock Game.", MessageBoxType.Error);
                 return;
             }
 
